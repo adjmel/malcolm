@@ -195,6 +195,11 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
+    struct timeval timeout;
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+
     wait_and_spoof(sockfd, &source, &target, interface);
     close(sockfd);
     return 0;
