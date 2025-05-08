@@ -9,7 +9,7 @@ volatile int running = 1;
 
 void stop_program(int sig) {
     (void)sig;
-    printf(RED "[✖] Exiting program...\n" RESET);
+    printf(RED "[❌] Exiting program...\n" RESET);
     running = 0;
 }
 
@@ -48,7 +48,7 @@ char *find_interface() {
     static char interface[IFNAMSIZ];
 
     if (getifaddrs(&ifaddr) == -1) {
-        fprintf(stderr, RED "[✖] getifaddrs: %s\n" RESET, strerror(errno));
+        fprintf(stderr, RED "[❌] getifaddrs: %s\n" RESET, strerror(errno));
         return NULL;
     }
 
@@ -94,9 +94,9 @@ void send_arp_reply(int sockfd, Host *source, Host *target, const char *interfac
     printf(MAGENTA "[📤] Sending ARP reply as spoofed source (%s)...\n" RESET, source->ip);
     
     if (sendto(sockfd, buffer, 42, 0, (struct sockaddr*)&sa, sizeof(sa)) < 0) {
-        fprintf(stderr, RED "[✖] sendto: %s\n" RESET, strerror(errno));
+        fprintf(stderr, RED "[❌] sendto: %s\n" RESET, strerror(errno));
     } else {
-        printf(GREEN "[✔] ARP reply sent! 🧠 Check target's ARP cache.\n" RESET);
+        printf(GREEN "[✅] ARP reply sent! 🧠 Check target's ARP cache.\n" RESET);
     }
 }
 
@@ -146,19 +146,19 @@ int setup_hosts(int argc, char *argv[], Host *source, Host *target) {
     ft_strncpy(target->ip, argv[3], 15);
 
     if (!validate_ip(source->ip)) {
-        fprintf(stderr, RED "[✖] Invalid IP: %s\n" RESET, source->ip);
+        fprintf(stderr, RED "[❌] Invalid IP: %s\n" RESET, source->ip);
         return -1;
     }
     if (!validate_ip(target->ip)) {
-        fprintf(stderr, RED "[✖] Invalid IP: %s\n" RESET, target->ip);
+        fprintf(stderr, RED "[❌] Invalid IP: %s\n" RESET, target->ip);
         return -1;
     }
     if (!parse_mac(argv[2], source->mac)) {
-        fprintf(stderr, RED "[✖] Invalid MAC: %s\n" RESET, argv[2]);
+        fprintf(stderr, RED "[❌] Invalid MAC: %s\n" RESET, argv[2]);
         return -1;
     }
     if (!parse_mac(argv[4], target->mac)) {
-        fprintf(stderr, RED "[✖] Invalid MAC: %s\n" RESET, argv[4]);
+        fprintf(stderr, RED "[❌] Invalid MAC: %s\n" RESET, argv[4]);
         return -1;
     }
     return 0;
@@ -176,14 +176,14 @@ int main(int argc, char *argv[]) {
 
     interface = find_interface();
     if (!interface) {
-        fprintf(stderr, RED "[✖] No suitable interface found.\n" RESET);
+        fprintf(stderr, RED "[❌] No suitable interface found.\n" RESET);
         return EXIT_FAILURE;
     }
 
-    printf(GREEN "[✔] Interface selected: %s\n" RESET, interface);
+    printf(GREEN "[✅] Interface selected: %s\n" RESET, interface);
 
     if ((sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ARP))) < 0) {
-        fprintf(stderr, RED "[✖] socket: %s\n" RESET, strerror(errno));
+        fprintf(stderr, RED "[❌] socket: %s\n" RESET, strerror(errno));
         return EXIT_FAILURE;
     }
 
