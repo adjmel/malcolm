@@ -195,6 +195,5 @@ int main(int argc, char *argv[]) {
     wait_and_spoof(sockfd, &source, &target, interface);
 
     close(sockfd);
-    printf(BLUE "[💤] Socket closed. Exiting cleanly.\n" RESET);
     return 0;
 }
