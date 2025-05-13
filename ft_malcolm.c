@@ -19,7 +19,10 @@ int validate_ip(const char *ip) {
 }
 
 int parse_mac(const char *mac_str, unsigned char *mac) {
-    int i = 0, byte_index = 0, len = 0;
+    int i = 0;
+    int byte_index = 0; 
+    int len = 0;
+    
     while (mac_str[len]) len++;
     if (len != 17) return 0;
 
