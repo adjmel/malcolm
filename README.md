@@ -62,7 +62,13 @@ ping <source_ip>
 
 3. `ft_malcolm` will detect the ARP request and send a forged ARP reply to the target.
 
----
+
+<!--Manually configure the default gateway for the network : 
+- ```sudo ip addr add 10.14.5.50/16 dev enp0s3``` : Add an IP address to the interface
+- ```sudo ip link set enp0s3 up``` : Enable network interface
+- ```sudo ip route add default via 10.14.0.1``` : Configure the default gateway-->
+
+
 
 ⚠️ **Disclaimer:**  
 This project is for **learning and educational use only**.  
