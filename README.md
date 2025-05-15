@@ -64,9 +64,9 @@ ping <source_ip>
 
 
 <!--Manually configure the default gateway for the network : 
-- ```sudo ip addr add 10.14.5.50/16 dev enp0s3``` : Add an IP address to the interface
-- ```sudo ip link set enp0s3 up``` : Enable network interface
-- ```sudo ip route add default via 10.14.0.1``` : Configure the default gateway-->
+- ```ip a``` : do this in the host machine and configure a static IP in the same network as the host machine, exemple : [192.168.1.92/24 → network: 192.168.1.0/24 -> 192.168.1.100/24]
+- ```sudo ip addr add 192.168.1.100/24 dev enp0s3``` : Add an IP address to the interface
+- ```sudo ip link set enp0s3 up``` : Enable network interface -->
 
 
 
