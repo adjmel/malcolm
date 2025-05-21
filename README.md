@@ -63,10 +63,9 @@ ping <source_ip>
 3. `ft_malcolm` will detect the ARP request and send a forged ARP reply to the target.
 
 
-<!--Manually configure the default gateway for the network : 
-- ```ip a``` : do this in the host machine and configure a static IP in the same network as the host machine, exemple : [192.168.1.92/24 → network: 192.168.1.0/24 -> 192.168.1.100/24]
-- ```sudo ip addr add 192.168.1.100/24 dev enp0s3``` : Add an IP address to the interface
-- ```sudo ip link set enp0s3 up``` : Enable network interface -->
+<!--To avoid pinging an existing IP address, I look at which network the IP address of my host machine is located in, then I spoof an unassigned IP address in this same network.
+ex : ip host : 10.12.3.7/16 
+ex : sudo ./ft_malcolm 10.12.3.255 08:00:27:de:d9:01 10.12.3.7 00:be:43:9c:44:38 -->
 
 
 
